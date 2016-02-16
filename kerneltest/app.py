@@ -268,11 +268,14 @@ def index():
 
     test_matrix = []
     for release in releases:
-        arches = dbtools.getarches(SESSION, release.releasenum)
-        for arch in arches:
-            results = dbtools.getlatest(SESSION, release.releasenum, arch[0])
+        kernels = dbtools.getkernelsbyrelease(SESSION, release.releasenum)
+        for kernel in kernels:
+            print kernel[0]
+            results = dbtools.getresultsbykernel(SESSION, kernel[0])
             if results:
                 test_matrix.append(results)
+
+    print test_matrix
 
     return flask.render_template(
         'index.html',
