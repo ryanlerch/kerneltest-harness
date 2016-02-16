@@ -6,43 +6,49 @@
     <link rel="shortcut icon" type="image/vnd.microsoft.icon"
         href="{{ url_for('static', filename='favicon.ico')}}"/>
     <link rel="stylesheet" type="text/css" media="screen"
-        href="{{ url_for('static', filename='koji.css') }}"/>
+        href="https://apps.fedoraproject.org/global/fedora-bootstrap-1.0.1/fedora-bootstrap.css"/>
     <link rel="stylesheet" type="text/css" media="screen"
         href="{{ url_for('static', filename='kerneltest.css') }}"/>
+    <link href="{{ url_for('static', filename='fonts/fonts.css') }}"
+        rel="stylesheet" type="text/css" />
     {% block header %}{% endblock %}
   </head>
   <body id="{% block tag %}{% endblock %}">
-
-    <div id="wrap">
-      <div id="innerwrap">
+    <div class="masthead">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-3">
+            <div id="header">
+              <a href="{{url_for('index')}}"><img height=40px src="{{ url_for('static', filename='kerneltest-logo.png') }}"
+                alt="Kerneltest Logo"/></a>
+            </div>
+          </div>
+          <div class="col-sm-9">
+            <ul class="nav navbar-nav nav-underline pull-xs-right">
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('stats')}}">Stats</a>
+              </li>
+              <li class="nav-item p-l-1">
+                <a class="nav-link" href="{{url_for('upload')}}">
+                    Upload
+                </a>
+              </li>
+              <li class="nav-item dropdown p-l-1">
+                {% if g.fas_user %}
+                  <a class="nav-link btn btn-success" href="{{ url_for('logout') }}?next={{request.url}}">logout</a>
+                {% else %}
+                  <a class="nav-link btn btn-primary" href="{{ url_for('login') }}?next={{request.url}}">login</a>
+                {% endif %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bodycontent p-b-3 p-t-1">
+      <div class="container">
 
         <!-- HEADER -->
-        <div id="header">
-          <img src="{{ url_for('static', filename='kerneltest-logo.png') }}"
-            alt="Kerneltest Logo" id="kojiLogo"/>
-        </div><!-- end header -->
-
-        <!-- MAIN NAVIGATION -->
-        <div id="mainNav">
-          <h4 class="hide">Main Site Links:</h4>
-          <ul>
-            <li id="homeTab"><a href="{{url_for('index')}}">Home</a></li>
-            <li id="locationsTab"><a href="{{url_for('stats')}}">Stats</a></li>
-            {% if g.fas_user %}
-            <li id="mymeetingTab"><a href="{{url_for('upload')}}">Upload</a></li>
-            {% endif %}
-          </ul>
-        </div><!-- end mainNav -->
-
-        <span id="loginInfo">
-          {% if g.fas_user %}
-            <span class="text">logged in as </span>
-            {{ g.fas_user.username }} |
-            <a href="{{ url_for('logout') }}?next={{request.url}}">log out</a>
-          {% else %}
-            <a href="{{ url_for('login') }}?next={{request.url}}">login</a>
-          {% endif %}
-        </span>
 
         <div id="content">
 
@@ -71,17 +77,21 @@
             </div>
         </div>
         {% endif %}
-
-        <p id="footer">
-          Copyright &copy; 2014 Red Hat
-          -- {{version}}
-        </p>
-
       </div>
+    </div>
+    <div class="footer p-t-1 p-b-1">
+        <div class="container">
+            <p class="text-muted">
+              Copyright &copy; 2014 Red Hat
+              -- {{version}}
+            </p>
+        </div>
     </div>
 
     {% block jscripts %}
-
+    <script type="text/javascript"
+        src="https://apps.fedoraproject.org/global/fedora-bootstrap-1.0.1/fedora-bootstrap.js">
+    </script>
     {% if config['FEDMENU_URL'] %}
     <script type="text/javascript"
       src="{{ config['FEDMENU_URL'] }}/js/jquery-1.11.2.min.js"></script>
