@@ -50,8 +50,6 @@
 
         <!-- HEADER -->
 
-        <div id="content">
-
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if category, messages %}
                 <ul id="flashes">
@@ -61,22 +59,25 @@
                 </ul>
                 {% endif %}
             {% endwith %}
-
+          {% block contentheader %}{% endblock %}
+          <div class="row">
+            <div class="col-md-9">
             {% block content %}{% endblock %}
-
-        </div>
-
+            </div>
         {% if options is defined %}
-        <div id="options">
-            <div id="options_title">
-                <h3>{% block options_title %}Options{% endblock %}</h3>
-            </div>
-            <div id="delimiter"></div>
-            <div id="options_content">
-                {% block options %}{% endblock %}
-            </div>
+        <div class="col-md-3">
+          <div class="card">
+              <div class="card-header">
+                  <strong>{% block options_title %}Options{% endblock %}</strong>
+              </div>
+              <div id="delimiter"></div>
+              <div id="options_content">
+                  {% block options %}{% endblock %}
+              </div>
+          </div>
         </div>
         {% endif %}
+        </div>
       </div>
     </div>
     <div class="footer p-t-1 p-b-1">
