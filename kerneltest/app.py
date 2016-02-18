@@ -266,14 +266,32 @@ def index():
     releases = dbtools.getcurrentreleases(SESSION)
     rawhide = dbtools.getrawhide(SESSION)
 
-    test_matrix = []
+    test_matrix = {}
     for release in releases:
         kernels = dbtools.getkernelsbyrelease(SESSION, release.releasenum)
         for kernel in kernels:
-            print kernel[0]
+            kernelversion = kernel[0].rpartition(".")[0].rpartition(".")[0]
             results = dbtools.getresultsbykernel(SESSION, kernel[0])
             if results:
-                test_matrix.append(results)
+                for result in results:
+                    if kernelversion in test_matrix:
+                        test_matrix[kernelversion]["tests"].append(result)
+                        if not result.fver in test_matrix[kernelversion]["fedoraversion"]:
+                            test_matrix[kernelversion]["fedoraversion"].append(result.fver)
+                        if not result.testarch in test_matrix[kernelversion]["arches"]:
+                            test_matrix[kernelversion]["arches"].append(result.testarch)
+                        if result.testresult == "PASS":
+                            test_matrix[kernelversion]["passes"] += 1
+                        else:
+                            test_matrix[kernelversion]["fails"] += 1
+                    else:
+                        if result.testresult == "PASS":
+                            passes = 1
+                            fails = 0
+                        else:
+                             passes = 0
+                             fails = 1
+                        test_matrix[kernelversion] = {"tests":[result], "arches": [result.testarch], "fedoraversion": [result.fver], "passes": passes, "fails": fails}
 
     print test_matrix
 

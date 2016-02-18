@@ -47,35 +47,29 @@
 {% endblock %}
 
 {% block content %}
-<table class="table table-hover table-striped m-b-0">
-  <thead class="thead-default">
-    <tr>
-        <th>Kernel</th>
-        <th>Arch</th>
-        <th>Release</th>
-        <th>Tests Run</th>
-    </tr>
-  </thead>
-  <tbody>
-{% for result in test_matrix %}
-    <tr>
-        <td>
-            <a href='{{ url_for("kernel", kernel=result[0].kver) }}'>
-                {{ result[0].kver }}
-            </a>
-        </td>
-        <td>
-              {{result[0].testarch}}
-        </td>
-        <td>
-              Fedora {{result[0].fver}}
-        </td>
-        <td>
-              {{result|count}}
-        </td>
-    </tr>
-{% endfor %}
-  </tbody>
-</table>
-
+<div class="list-group">
+  {% for kernel, details in test_matrix.iteritems() %}
+    <a class="list-group-item" href="#">
+      <div class="row">
+        <div class="col-md-6">
+          <div>
+            {{kernel}}
+            {%for arch in details["arches"]%}
+              <span class="label label-default">{{arch}}</span>
+            {%endfor%}
+            {%for fver in details["fedoraversion"]%}
+              <span class="label label-primary">F{{fver}}</span>
+            {%endfor%}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="pull-xs-right">
+            {%if details["fails"] != 0 %}<span class="label label-danger">{{details["fails"]}} FAILED</span>&nbsp;{%endif%}
+            {%if details["passes"] != 0 %}<span class="label label-success">{{details["passes"]}} PASSED</span>{%endif%}
+          </div>
+        </div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
 {% endblock %}
