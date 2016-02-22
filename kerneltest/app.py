@@ -1,10 +1,12 @@
 # Licensed under the terms of the GNU GPL License version 2
 
 import datetime
+import dateparser
 import logging
 import logging.handlers
 import os
 import sys
+import arrow
 import urlparse
 from functools import wraps
 
@@ -277,6 +279,8 @@ def index():
                 test_matrix[kernelversion]["passes"] += 1
             else:
                 test_matrix[kernelversion]["fails"] += 1
+            if test_matrix[kernelversion]["lasttestdate"] < dateparser.parse(kernel.testdate):
+                test_matrix[kernelversion]["lasttestdate"] = dateparser.parse(kernel.testdate)
         else:
             if kernel.testresult == "PASS":
                 passes = 1
@@ -284,7 +288,7 @@ def index():
             else:
                  passes = 0
                  fails = 1
-            test_matrix[kernelversion] = {"tests":[kernel], "arches": [kernel.testarch], "fedoraversion": [kernel.fver], "passes": passes, "fails": fails}
+            test_matrix[kernelversion] = {"tests":[kernel], "arches": [kernel.testarch], "fedoraversion": [kernel.fver], "passes": passes, "fails": fails, "lasttestdate":dateparser.parse(kernel.testdate)}
 
     return flask.render_template(
         'index.html',
@@ -580,6 +584,15 @@ def admin_edit_release(relnum):
         form=form,
         release=release,
         submit_text='Edit release')
+
+### Filters
+@APP.template_filter('parse_time')
+def parse_time(timestring):
+    return dateparser.parse(timestring)
+
+@APP.template_filter('humanize')
+def humanize_date(date):
+    return arrow.get(date).humanize()
 
 
 ## Form used to upload new results

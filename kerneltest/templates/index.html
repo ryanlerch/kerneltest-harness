@@ -2,7 +2,7 @@
 
 {% block title %}Home{% endblock %}
 
-{% set options = True %}
+{#{% set options = True %}
 {% block options_title %}Current releases{% endblock %}
 {%block options %}
 <ul class="list-group list-group-flush">
@@ -33,7 +33,7 @@
   </li>
   {% endfor %}
 </ul>
-{% endblock %}
+{% endblock %}#}
 {% block contentheader %}
 <h1>Fedora Kernel Test Results</h1>
 
@@ -53,7 +53,9 @@
       <div class="row">
         <div class="col-md-6">
           <div>
-            {{kernel}}
+            <strong>{{kernel}}</strong>
+          </div>
+          <div>
             {%for arch in details["arches"]%}
               <span class="label label-default">{{arch}}</span>
             {%endfor%}
@@ -62,10 +64,12 @@
             {%endfor%}
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="pull-xs-right">
-            {%if details["fails"] != 0 %}<span class="label label-danger">{{details["fails"]}} FAILED</span>&nbsp;{%endif%}
-            {%if details["passes"] != 0 %}<span class="label label-success">{{details["passes"]}} PASSED</span>{%endif%}
+        <div class="col-md-6 text-xs-right">
+          <div>Last tested {{details["lasttestdate"]|humanize}}</div>
+
+          <div>
+            <span class="label {{'label-danger' if details["fails"] != 0 else 'label-default'}}">{{details["fails"]}} FAILED</span>&nbsp;
+            <span class="label {{'label-success' if details["passes"] != 0 else 'label-default'}}">{{details["passes"]}} PASSED</span>
           </div>
         </div>
       </div>

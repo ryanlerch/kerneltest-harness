@@ -11,6 +11,9 @@
           <div>
             {{kerneltest.kver}}
           </div>
+          <div>
+            {{kerneltest.testdate | parse_time | humanize}}
+          </div>
         </div>
         <div class="col-md-6">
           <div class="pull-xs-right">
