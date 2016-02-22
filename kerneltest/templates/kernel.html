@@ -1,30 +1,31 @@
 {% extends "master.html" %}
 
 {% block content %}
-<h1>Results for kernel {{ kernel.kver }}</h1>
+<h1>Results for kernel {{ kernel }}</h1>
 
-<table border='1' style='width:550px'>
-<tr>
-    <th>Kernel</th>
-    <th>Result</th>
-    <th>log</th>
-</tr>
-{% for test in tests %}
-    <tr>
-        <td>{{ test.kver }}</td>
-        <td>
-            {% if test.testresult == 'PASS' %}
-            <img src="{{ url_for('static', filename='Approved.png') }}" />
-            {% else %}
-            <img src="{{ url_for('static', filename='Denied.png') }}" />
-            {% endif %}
-            {{ test.testresult }}
-        </td>
-        <td><a href='{{ url_for("logs", logid=test.testid) }}'>
-                logs </a>
-    </tr>
-{% endfor %}
-</table>
+<div class="list-group">
+  {% for kerneltest in test_matrix["tests"] %}
+    <a class="list-group-item" href="#">
+      <div class="row">
+        <div class="col-md-6">
+          <div>
+            {{kerneltest.kver}}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="pull-xs-right">
+            <span class="label label-default">{{kerneltest.testarch}}</span>
+            <span class="label label-primary">F{{kerneltest.fver}}</span>
+            {%if kerneltest.testresult == 'PASS' %}
+              <span class="label label-success">PASS</span>&nbsp;
+            {%else%}
+              <span class="label label-danger">FAIL</span>&nbsp;
+            {%endif%}
+          </div>
+        </div>
+      </div>
+    </a>
+  {% endfor %}
 </div>
 
 {% endblock %}

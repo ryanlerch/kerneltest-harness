@@ -49,7 +49,7 @@
 {% block content %}
 <div class="list-group">
   {% for kernel, details in test_matrix.iteritems() %}
-    <a class="list-group-item" href="#">
+    <a class="list-group-item" href="{{ url_for("kernel", kernel=kernel) }}">
       <div class="row">
         <div class="col-md-6">
           <div>

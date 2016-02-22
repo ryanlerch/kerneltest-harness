@@ -263,42 +263,31 @@ def shutdown_session(exception=None):
 @APP.route('/')
 def index():
     ''' Display the index page. '''
-    releases = dbtools.getcurrentreleases(SESSION)
-    rawhide = dbtools.getrawhide(SESSION)
-
     test_matrix = {}
-    for release in releases:
-        kernels = dbtools.getkernelsbyrelease(SESSION, release.releasenum)
-        for kernel in kernels:
-            kernelversion = kernel[0].rpartition(".")[0].rpartition(".")[0]
-            results = dbtools.getresultsbykernel(SESSION, kernel[0])
-            if results:
-                for result in results:
-                    if kernelversion in test_matrix:
-                        test_matrix[kernelversion]["tests"].append(result)
-                        if not result.fver in test_matrix[kernelversion]["fedoraversion"]:
-                            test_matrix[kernelversion]["fedoraversion"].append(result.fver)
-                        if not result.testarch in test_matrix[kernelversion]["arches"]:
-                            test_matrix[kernelversion]["arches"].append(result.testarch)
-                        if result.testresult == "PASS":
-                            test_matrix[kernelversion]["passes"] += 1
-                        else:
-                            test_matrix[kernelversion]["fails"] += 1
-                    else:
-                        if result.testresult == "PASS":
-                            passes = 1
-                            fails = 0
-                        else:
-                             passes = 0
-                             fails = 1
-                        test_matrix[kernelversion] = {"tests":[result], "arches": [result.testarch], "fedoraversion": [result.fver], "passes": passes, "fails": fails}
-
-    print test_matrix
+    kernels = dbtools.getallkernels(SESSION)
+    for kernel in kernels:
+        kernelversion = kernel.kver.rpartition(".")[0].rpartition(".")[0]
+        if kernelversion in test_matrix:
+            test_matrix[kernelversion]["tests"].append(kernel)
+            if not kernel.fver in test_matrix[kernelversion]["fedoraversion"]:
+                test_matrix[kernelversion]["fedoraversion"].append(kernel.fver)
+            if not kernel.testarch in test_matrix[kernelversion]["arches"]:
+                test_matrix[kernelversion]["arches"].append(kernel.testarch)
+            if kernel.testresult == "PASS":
+                test_matrix[kernelversion]["passes"] += 1
+            else:
+                test_matrix[kernelversion]["fails"] += 1
+        else:
+            if kernel.testresult == "PASS":
+                passes = 1
+                fails = 0
+            else:
+                 passes = 0
+                 fails = 1
+            test_matrix[kernelversion] = {"tests":[kernel], "arches": [kernel.testarch], "fedoraversion": [kernel.fver], "passes": passes, "fails": fails}
 
     return flask.render_template(
         'index.html',
-        releases=releases,
-        rawhide=rawhide,
         test_matrix=test_matrix,
     )
 
@@ -318,12 +307,25 @@ def release(release):
 @APP.route('/kernel/<kernel>')
 def kernel(kernel):
     ''' Display page with information about a specific kernel. '''
-    tests = dbtools.getresultsbykernel(SESSION, kernel)
+    test_matrix = {"tests":[], "arches": [], "fedoraversion": [], "passes": 0, "fails": 0}
+    kerneltests = dbtools.getallkernels(SESSION)
+    for kerneltest in kerneltests:
+        kernelversion = kerneltest.kver.rpartition(".")[0].rpartition(".")[0]
+        if kernelversion == kernel:
+            test_matrix["tests"].append(kerneltest)
+            if not kerneltest.fver in test_matrix["fedoraversion"]:
+                test_matrix["fedoraversion"].append(kerneltest.fver)
+            if not kerneltest.testarch in test_matrix["arches"]:
+                test_matrix["arches"].append(kerneltest.testarch)
+            if kerneltest.testresult == "PASS":
+                test_matrix["passes"] += 1
+            else:
+                test_matrix["fails"] += 1
 
     return flask.render_template(
         'kernel.html',
         kernel=kernel,
-        tests=tests,
+        test_matrix=test_matrix,
     )
 
 
